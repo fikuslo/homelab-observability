@@ -7,3 +7,10 @@ services:
     image: grafana/grafana
     ports:
       - "127.0.0.1:3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  grafana_data:
+    external: true
+    name: homelab-observability_grafana_data
