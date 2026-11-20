@@ -5,7 +5,7 @@ services:
       - "127.0.0.1:9090:9090"
     volumes:
       - prometheus_data:/prometheus
-
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
   grafana:
     image: grafana/grafana
     ports:
