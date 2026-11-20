@@ -12,6 +12,10 @@ services:
       - "127.0.0.1:3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
+  blackbox:
+    image: prom/blackbox-exporter:v0.29.1
+    ports:
+      - "127.0.0.1:9115:9115"
 
 volumes:
   grafana_data:
