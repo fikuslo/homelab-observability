@@ -1,0 +1,9 @@
+- targets:
+    - YOUR_ROUTER_IP
+  labels:
+    target_name: Router
+
+- targets:
+    - 1.1.1.1
+  labels:
+    target_name: Cloudflare

@@ -2,11 +2,7 @@
   "apiVersion": "dashboard.grafana.app/v2",
   "kind": "Dashboard",
   "metadata": {
-    "name": "adxkdl9",
-    "generation": 19,
-    "creationTimestamp": "2026-11-20T15:48:29Z",
-    "labels": {},
-    "annotations": {}
+    "name": "adxkdl9"
   },
   "spec": {
     "annotations": [
@@ -17,10 +13,10 @@
             "kind": "DataQuery",
             "group": "grafana",
             "version": "v0",
-            "spec": {},
-            "labels": {
-              "grafana.app/export-label": "grafana-1"
-            }
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "spec": {}
           },
           "enable": true,
           "hide": true,
@@ -51,15 +47,14 @@
                       "kind": "DataQuery",
                       "group": "prometheus",
                       "version": "v0",
+                      "datasource": {
+                        "name": "fg4vj4dxlmc5cb"
+                      },
                       "spec": {
                         "editorMode": "code",
                         "expr": "probe_success{job=\"blackbox-http\"}",
                         "legendFormat": "__auto",
                         "range": true
-                      },
-                      "labels": {
-                        "grafana.app/export-label": "prometheus-1",
-                        "grafana.app/export-datasource-name": "prometheus"
                       }
                     },
                     "refId": "A",
@@ -77,9 +72,9 @@
             "version": "13.3.1",
             "spec": {
               "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
                 "orientation": "auto",
                 "percentChangeColorMode": "standard",
                 "reduceOptions": {
@@ -128,7 +123,8 @@
                   "color": {
                     "mode": "thresholds",
                     "fixedColor": "#ad46ff"
-                  }
+                  },
+                  "fieldMinMax": false
                 },
                 "overrides": []
               }
@@ -155,15 +151,14 @@
                       "kind": "DataQuery",
                       "group": "prometheus",
                       "version": "v0",
+                      "datasource": {
+                        "name": "fg4vj4dxlmc5cb"
+                      },
                       "spec": {
                         "editorMode": "code",
                         "expr": "probe_duration_seconds{job=\"blackbox-http\"} * 1000",
                         "legendFormat": "__auto",
                         "range": true
-                      },
-                      "labels": {
-                        "grafana.app/export-label": "prometheus-1",
-                        "grafana.app/export-datasource-name": "prometheus"
                       }
                     },
                     "refId": "A",
@@ -280,15 +275,14 @@
                       "kind": "DataQuery",
                       "group": "prometheus",
                       "version": "v0",
+                      "datasource": {
+                        "name": "fg4vj4dxlmc5cb"
+                      },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "avg_over_time(\n  probe_icmp_duration_seconds{job=\"blackbox-icmp\",phase=\"rtt\"}[5m]\n) * 1000",
-                        "legendFormat": "__auto",
+                        "expr": "avg_over_time(probe_icmp_duration_seconds{job=\"blackbox-icmp\",phase=\"rtt\",target_name!=\"\"}[5m]) * 1000",
+                        "legendFormat": "{{target_name}}",
                         "range": true
-                      },
-                      "labels": {
-                        "grafana.app/export-label": "prometheus-1",
-                        "grafana.app/export-datasource-name": "prometheus"
                       }
                     },
                     "refId": "A",
@@ -378,34 +372,7 @@
                   },
                   "fieldMinMax": false
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "scope": "series",
-                      "options": "{instance=\"1.1.1.1\", job=\"blackbox-icmp\", phase=\"rtt\"}"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Cloudflare"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "scope": "series",
-                      "options": "{instance=\"192.168.0.1\", job=\"blackbox-icmp\", phase=\"rtt\"}"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Router"
-                      }
-                    ]
-                  }
-                ]
+                "overrides": []
               }
             }
           }
@@ -429,15 +396,14 @@
                       "kind": "DataQuery",
                       "group": "prometheus",
                       "version": "v0",
+                      "datasource": {
+                        "name": "fg4vj4dxlmc5cb"
+                      },
                       "spec": {
                         "editorMode": "code",
-                        "expr": "(1 - avg_over_time(probe_success{job=\"blackbox-icmp\"}[5m])) * 100",
-                        "legendFormat": "__auto",
+                        "expr": "(1 - avg_over_time(probe_success{job=\"blackbox-icmp\",target_name!=\"\"}[5m])) * 100",
+                        "legendFormat": "{{target_name}}",
                         "range": true
-                      },
-                      "labels": {
-                        "grafana.app/export-label": "prometheus-1",
-                        "grafana.app/export-datasource-name": "prometheus"
                       }
                     },
                     "refId": "A",
@@ -503,34 +469,7 @@
                     "mode": "thresholds"
                   }
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "scope": "series",
-                      "options": "{instance=\"1.1.1.1\", job=\"blackbox-icmp\"}"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Cloudflare"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "scope": "series",
-                      "options": "{instance=\"192.168.0.1\", job=\"blackbox-icmp\"}"
-                    },
-                    "properties": [
-                      {
-                        "id": "displayName",
-                        "value": "Router"
-                      }
-                    ]
-                  }
-                ]
+                "overrides": []
               }
             }
           }
@@ -573,7 +512,7 @@
               "x": 0,
               "y": 3,
               "width": 12,
-              "height": 7,
+              "height": 9,
               "element": {
                 "kind": "ElementReference",
                 "name": "panel-2"
@@ -586,7 +525,7 @@
               "x": 12,
               "y": 3,
               "width": 12,
-              "height": 7,
+              "height": 9,
               "element": {
                 "kind": "ElementReference",
                 "name": "panel-3"

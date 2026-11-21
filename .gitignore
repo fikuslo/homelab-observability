@@ -1,1 +1,17 @@
 .DS_Store
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Local monitoring targets
+prometheus/targets/*.local.yml
+
+# Backups and databases
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.tar.gz
+backups/
