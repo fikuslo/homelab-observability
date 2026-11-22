@@ -1,5 +1,7 @@
 # Homelab Observability
 
+[![Validate Infrastructure](https://github.com/fikuslo/homelab-observability/actions/workflows/validate.yml/badge.svg)](https://github.com/fikuslo/homelab-observability/actions/workflows/validate.yml)
+
 A self-hosted network monitoring lab built with Docker Compose, Prometheus, Grafana, and Blackbox Exporter.
 
 Designed to monitor network availability, latency, and failed connectivity probes with automated deployment and persistent storage.
@@ -167,6 +169,53 @@ docker compose run --rm --no-deps \
   --entrypoint /bin/promtool prometheus \
   check config /etc/prometheus/prometheus.yml
 ```
+
+## Continuous Integration
+
+The project uses GitHub Actions to automatically validate infrastructure changes.
+
+Workflow: `.github/workflows/validate.yml`
+
+The CI pipeline runs on every push to `main` and on pull requests targeting `main`.
+
+### Configuration Validation
+
+The Bash script `scripts/validate.sh` performs:
+
+- Docker Compose configuration validation.
+- Grafana dashboard JSON syntax validation.
+- Prometheus configuration validation using `promtool`.
+- Preparation of temporary monitoring targets when local configuration is unavailable.
+
+Run the checks locally:
+
+```bash
+./scripts/validate.sh
+```
+
+### Integration Smoke Testing
+
+GitHub Actions also verifies that the monitoring stack can start and respond to requests.
+
+The pipeline:
+
+1. Creates temporary monitoring targets and Docker volumes.
+2. Starts Prometheus, Grafana, and Blackbox Exporter.
+3. Checks the readiness endpoints of all three services.
+4. Executes an HTTP probe through Blackbox Exporter.
+5. Collects container logs if a test fails.
+6. Removes the test containers and volumes after execution.
+
+Tests run on an isolated GitHub-hosted Ubuntu runner.
+
+The pipeline does not access the user's local network or Docker volumes.
+
+### Scope
+
+The CI pipeline validates configuration syntax, service startup, readiness, and one HTTP probe.
+
+It does not currently test all Grafana panels, perform automated production deployment, or verify backup restoration.
+
 
 ## Troubleshooting
 
