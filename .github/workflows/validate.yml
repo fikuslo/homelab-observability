@@ -14,9 +14,9 @@ permissions:
 
 jobs:
   validate:
-    name: Configuration Validation
+    name: Configuration and Integration Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -24,3 +24,67 @@ jobs:
 
       - name: Validate infrastructure configuration
         run: ./scripts/validate.sh
+
+      - name: Prepare isolated test environment
+        run: |
+          cp prometheus/targets/icmp.example.yml \
+             prometheus/targets/icmp.local.yml
+
+          sed -i 's/YOUR_ROUTER_IP/127.0.0.1/' \
+            prometheus/targets/icmp.local.yml
+
+          docker volume create homelab-observability_prometheus_data
+          docker volume create homelab-observability_grafana_data
+
+      - name: Start monitoring stack
+        run: docker compose up -d
+
+      - name: Verify service readiness
+        run: |
+          set -euo pipefail
+
+          check_url() {
+            local name="$1"
+            local url="$2"
+
+            echo "Checking $name..."
+
+            for attempt in {1..30}; do
+              if curl --fail --silent --show-error \
+                --max-time 3 "$url" > /dev/null 2>&1; then
+                echo "$name is ready."
+                return 0
+              fi
+              sleep 2
+            done
+
+            echo "ERROR: $name did not become ready."
+            return 1
+          }
+
+          check_url "Prometheus" "http://127.0.0.1:9090/-/ready"
+          check_url "Grafana" "http://127.0.0.1:3000/api/health"
+          check_url "Blackbox Exporter" "http://127.0.0.1:9115/-/healthy"
+
+      - name: Verify actual HTTP probe
+        run: |
+          set -euo pipefail
+
+          curl --fail --silent --show-error --get \
+            --data-urlencode "module=http_2xx" \
+            --data-urlencode "target=http://prometheus:9090/-/ready" \
+            http://127.0.0.1:9115/probe \
+            | grep -Eq '^probe_success 1(\.0)?$'
+
+          echo "HTTP probe passed."
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs --tail=100
+
+      - name: Clean up test environment
+        if: always()
+        run: |
+          docker compose down || true
+          docker volume rm homelab-observability_prometheus_data \
+            homelab-observability_grafana_data || true
